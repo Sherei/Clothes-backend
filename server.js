@@ -390,53 +390,56 @@ app.post("/product", async (req, res) => {
 
 app.get("/products", async (req, res) => {
   try {
-    const { name, sort, minPrice, maxPrice, search, size } = req.query;
+    const { name, sort, minPrice, maxPrice, search, size, color } = req.query;
 
     let query = {};
     let sortQuery = {};
 
-    if (name === "all") {
-      query = {};
-    } else {
-      query = {
-        $or: [
-          { category: new RegExp(`^${name}$`, 'i') },
-        ]
-      };
-
+    // Filter by category (if category name is provided)
+    if (name && name !== "all") {
+      query.category = new RegExp(`^${name}$`, 'i');
     }
 
+    // Filter by price range
     if (minPrice || maxPrice) {
-      query.Fprice = { $gte: minPrice, $lte: maxPrice };
+      query.Fprice = { $gte: minPrice || 0, $lte: maxPrice || Infinity };
     }
 
+    // Filter by search term (title or category)
     if (search) {
       query.$or = [
+        { title: new RegExp(search, 'i') },
         { category: new RegExp(search, 'i') },
-        { title: new RegExp(search, 'i') }
       ];
     }
 
-    if (sort) {
-      switch (sort) {
-        case "asc":
-          sortQuery = { Fprice: -1 };
-          break;
-        case "desc":
-          sortQuery = { Fprice: 1 };
-          break;
-        default:
-          break;
-      }
+    // Filter by size (if size filter is provided)
+    if (size) {
+      query.sizes = size;
     }
 
-    const newProduct = await Product.find(query).sort({ ...sortQuery, _id: -1 }).exec();
-    res.json(newProduct);
+    // Filter by color (if color filter is provided)
+    if (color) {
+      query.colors = color;
+    }
 
-  } catch (e) {
+    // Sort by price
+    if (sort) {
+      sortQuery = sort === "asc" ? { Fprice: 1 } : { Fprice: -1 };
+    }
+
+    // Fetch products based on filters and sort order
+    const filteredProducts = await Product.find(query)
+      .sort({ ...sortQuery, _id: -1 })
+      .exec();
+
+    res.json(filteredProducts);
+
+  } catch (error) {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
+
 
 
 app.get("/product", async (req, res) => {
