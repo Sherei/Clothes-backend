@@ -14,12 +14,6 @@ const orderItemSchema = new mongoose.Schema({
     discount: Number,
     size:String,
     color:String,
-    fabric:String,
-    detail:String,
-    base:String,
-    headboard:String,
-    ottoman:String,
-    mattress:String,
 
 });
 
