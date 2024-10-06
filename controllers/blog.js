@@ -69,17 +69,11 @@ exports.AddBlog = async (req, res) => {
       existingBlog.issueDate = req.body.issueDate;
       existingBlog.image = req.body.image || existingBlog.image;
       existingBlog.introduction = req.body.introduction;
-      existingBlog.heading1 = req.body.heading1;
       existingBlog.description1 = req.body.description1;
-      existingBlog.heading2 = req.body.heading2;
       existingBlog.description2 = req.body.description2;
-      existingBlog.heading3 = req.body.heading3;
       existingBlog.description3 = req.body.description3;
-      existingBlog.heading4 = req.body.heading4;
       existingBlog.description4 = req.body.description4;
-      existingBlog.heading5 = req.body.heading5;
       existingBlog.description5 = req.body.description5;
-      existingBlog.heading6 = req.body.heading6;
       existingBlog.description6 = req.body.description6;
       await existingBlog.save();
       res.json({ message: "Blog Updated" });
