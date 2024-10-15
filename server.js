@@ -31,8 +31,8 @@ const { appendFile } = require("fs/promises");
 const { error } = require("console");
 
 // Stripe
-const Stripe = require("stripe");
-const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
+// const Stripe = require("stripe");
+// const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 
 // define routes
 const userRoutes = require("./routes/user");
@@ -44,21 +44,21 @@ const videoRoutes = require("./routes/video");
 const blogRoutes = require("./routes/blog");
 const collectionRoutes = require("./routes/collection");
 
-app.post("/api/create-payment-intent", async (req, res) => {
-  const { amount, currency } = req.body; // Get payment amount and currency from frontend
+// app.post("/api/create-payment-intent", async (req, res) => {
+//   const { amount, currency } = req.body; // Get payment amount and currency from frontend
 
-  try {
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount,
-      currency,
-    });
+//   try {
+//     const paymentIntent = await stripe.paymentIntents.create({
+//       amount,
+//       currency,
+//     });
 
-    res.json({ clientSecret: paymentIntent.client_secret });
-  } catch (err) {
-    console.error("Error creating payment intent:", err);
-    res.status(500).json({ error: "Payment failed" });
-  }
-});
+//     res.json({ clientSecret: paymentIntent.client_secret });
+//   } catch (err) {
+//     console.error("Error creating payment intent:", err);
+//     res.status(500).json({ error: "Payment failed" });
+//   }
+// });
 
 // Admin Data
 
