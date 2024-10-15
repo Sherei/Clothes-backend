@@ -26,12 +26,12 @@ const Blog = require("./model/blog");
 
 const Cart = require("./model/cart");
 
-
 const token = require("jsonwebtoken");
 const { appendFile } = require("fs/promises");
 const { error } = require("console");
 
-
+const Stripe = require("stripe");
+const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 
 // define routes
 const userRoutes = require("./routes/user");
@@ -43,6 +43,21 @@ const videoRoutes = require("./routes/video");
 const blogRoutes = require("./routes/blog");
 const collectionRoutes = require("./routes/collection");
 
+app.post("/api/create-payment-intent", async (req, res) => {
+  const { amount, currency } = req.body; // Get payment amount and currency from frontend
+
+  try {
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount,
+      currency,
+    });
+
+    res.json({ clientSecret: paymentIntent.client_secret });
+  } catch (err) {
+    console.error("Error creating payment intent:", err);
+    res.status(500).json({ error: "Payment failed" });
+  }
+});
 
 // Admin Data
 
@@ -166,7 +181,6 @@ app.get("/AdminBlog", async (req, res) => {
   }
 });
 
-
 app.use("/", userRoutes);
 app.use("/", productRoutes);
 app.use("/", cartRoutes);
@@ -175,7 +189,7 @@ app.use("/", commentRoutes);
 app.use("/", videoRoutes);
 app.use("/", blogRoutes);
 app.use("/", collectionRoutes);
-
+// app.use() // Remove or comment out this line
 
 const port = process.env.PORT || 3010;
 
