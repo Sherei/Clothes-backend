@@ -30,6 +30,7 @@ const token = require("jsonwebtoken");
 const { appendFile } = require("fs/promises");
 const { error } = require("console");
 
+// Stripe
 const Stripe = require("stripe");
 const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 
