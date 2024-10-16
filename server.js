@@ -13,10 +13,11 @@ require("./model/db");
 const bcrypt = require("bcrypt");
 
 const SignupUsers = require("./model/user");
-
+const paymentModal = require("./model/orders");
 const Product = require("./model/product");
 
 const Comment = require("./model/comment");
+const Payment = require("./model/payment"); // Import the Payment model
 
 const Collection = require("./model/collection");
 
@@ -30,9 +31,8 @@ const token = require("jsonwebtoken");
 const { appendFile } = require("fs/promises");
 const { error } = require("console");
 
-// Stripe
-// const Stripe = require("stripe");
-// const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
+const Stripe = require("stripe");
+const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 
 // define routes
 const userRoutes = require("./routes/user");
@@ -43,22 +43,63 @@ const commentRoutes = require("./routes/comment");
 const videoRoutes = require("./routes/video");
 const blogRoutes = require("./routes/blog");
 const collectionRoutes = require("./routes/collection");
+const paymentRoute = require("./routes/paymentRoute");
 
-// app.post("/api/create-payment-intent", async (req, res) => {
-//   const { amount, currency } = req.body; // Get payment amount and currency from frontend
+app.post("/api/create-payment-intent", async (req, res) => {
+  const { amount, currency } = req.body; // Get payment amount, currency, and payment method from frontend
 
-//   try {
-//     const paymentIntent = await stripe.paymentIntents.create({
-//       amount,
-//       currency,
-//     });
+  try {
+    // Create a payment intent
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount,
+      currency,
+      // payment_method: paymentMethodId, // Optionally attach the payment method
+    });
 
-//     res.json({ clientSecret: paymentIntent.client_secret });
-//   } catch (err) {
-//     console.error("Error creating payment intent:", err);
-//     res.status(500).json({ error: "Payment failed" });
-//   }
-// });
+    // Extract last 4 digits of card (if available)
+    const last4 =
+      paymentIntent.charges?.data[0]?.payment_method_details?.card?.last4 ||
+      null;
+    const secrate = paymentIntent.client_secret;
+    // Save payment details to MongoDB
+    const payment = new Payment({
+      amount,
+      currency,
+      secrate,
+      // // paymentMethodId,
+      // last4,
+      status: paymentIntent.status,
+    });
+    await payment.save();
+
+    // Send the client secret back to the frontend
+    res.json({ clientSecret: paymentIntent.client_secret });
+  } catch (err) {
+    console.error("Error creating payment intent:", err);
+    res.status(500).json({ error: "Payment failed" });
+  }
+});
+app.post("/api/save-payment-status", async (req, res) => {
+  const { paymentId, status } = req.body;
+
+  try {
+    // Find the payment by the payment intent ID and update its status
+    const payment = await Payment.findOneAndUpdate(
+      { secrate: paymentId }, // Match by payment intent ID
+      { status }, // Update the status to "paid" or whatever is passed
+      { new: true }
+    );
+
+    if (!payment) {
+      return res.status(404).json({ error: "Payment not found" });
+    }
+
+    res.json({ message: "Payment status updated successfully", payment });
+  } catch (err) {
+    console.error("Error updating payment status:", err);
+    res.status(500).json({ error: "Failed to update payment status" });
+  }
+});
 
 // Admin Data
 
@@ -183,6 +224,7 @@ app.get("/AdminBlog", async (req, res) => {
 });
 
 app.use("/", userRoutes);
+
 app.use("/", productRoutes);
 app.use("/", cartRoutes);
 app.use("/", orderRoutes);
@@ -190,6 +232,7 @@ app.use("/", commentRoutes);
 app.use("/", videoRoutes);
 app.use("/", blogRoutes);
 app.use("/", collectionRoutes);
+app.use("/", paymentRoute);
 // app.use() // Remove or comment out this line
 
 const port = process.env.PORT || 3010;
