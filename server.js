@@ -17,7 +17,7 @@ const paymentModal = require("./model/orders");
 const Product = require("./model/product");
 
 const Comment = require("./model/comment");
-const Payment = require("./model/payment"); // Import the Payment model
+const Payment = require("./model/payment"); 
 
 const Collection = require("./model/collection");
 
