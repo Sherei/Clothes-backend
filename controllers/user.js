@@ -20,6 +20,7 @@ const generateOTP = () => {
 };
 exports.Signup = async (req, res) => {  
 
+    console.log("Welcome");
     try {
       const existingUser = await SignupUsers.findOne({ email: req.body.email });
   
@@ -28,6 +29,8 @@ exports.Signup = async (req, res) => {
       } else {
         const otp = generateOTP();
         const otpExpires = Date.now() + 10 * 60 * 1000;
+  
+        // const hashedPassword = await bcrypt.hash(req.body.password, 10);
   
         const newUser = new SignupUsers({
           ...req.body,
@@ -78,11 +81,12 @@ exports.Signup = async (req, res) => {
   //verify email
   exports.VerifyEmail = async (req, res) => {  
 
+    console.log("first");
     try {
       const { email, otp } = req.body;
       console.log(email, otp, "email");
       const user = await SignupUsers.findOne({ email });
-        
+  
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }

@@ -17,7 +17,7 @@ const paymentModal = require("./model/orders");
 const Product = require("./model/product");
 
 const Comment = require("./model/comment");
-const Payment = require("./model/payment"); 
+const Payment = require("./model/payment"); // Import the Payment model
 
 const Collection = require("./model/collection");
 
@@ -100,7 +100,6 @@ app.post("/api/save-payment-status", async (req, res) => {
     res.status(500).json({ error: "Failed to update payment status" });
   }
 });
-
 // Admin Data
 
 app.get("/dashboard", async function (req, res) {
