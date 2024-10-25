@@ -23,6 +23,7 @@ exports.AddOrder = async (req, res) => {
       name2: req.body.name2,
       number1: req.body.number1,
       street: req.body.street,
+      priceId: req.body.priceId,
       appartment: req.body.appartment,
       country: req.body.country,
       city: req.body.city,

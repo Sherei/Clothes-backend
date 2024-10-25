@@ -21,6 +21,7 @@ const orderSchema = new mongoose.Schema({
   orderItems: [orderItemSchema],
   total: Number,
   name1: String,
+  priceId: String,
   name2: String,
   number1: {
     type: Number,

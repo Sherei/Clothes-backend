@@ -111,7 +111,7 @@ exports.AddProduct = async (req, res) => {
             category: { $in: categories }
         });
   
-        console.log(activeProducts, "here active products");
+        // console.log(activeProducts, "here active products");
         
         // Step 4: Send the active products as response
         res.json(activeProducts);

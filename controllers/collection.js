@@ -86,7 +86,7 @@ exports.CollectionUpdate = async (req, res) => {
 
 exports.getActiveStatus = async (req, res) => {  
 
-    console.log("running")
+    // console.log("running")
     try {
       const newCollection = await Collection.find({ status: "active" });
       res.json(newCollection);
