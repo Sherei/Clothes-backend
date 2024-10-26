@@ -75,9 +75,9 @@ exports.CollectionUpdate = async (req, res) => {
     if (!existingCollection) {
       return res.status(404).json({ message: "Collection not found" });
     }
-    existingCollection.title = req.body.title;
-    existingCollection.image = req.body.image || existingBlog.image;
-    await existingBlog.save();
+    existingCollection.category = req.body.category;
+    existingCollection.image = req.body.image || existingCollection.image;
+    await existingCollection.save();
     res.json({ message: "Collection Updated" });
   } catch (e) {
     res.status(500).json({ message: "Internal Server Error" });

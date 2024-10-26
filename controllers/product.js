@@ -20,61 +20,94 @@ exports.AddProduct = async (req, res) => {
     }
   };
 
-  exports.GetProduct = async (req, res) => {  
+  // exports.GetProduct = async (req, res) => {
+  //   try {
+  //     const { name, sort, minPrice, maxPrice, search, size, color } = req.query;
+  
+  //     let query = {};
+  //     let sortQuery = {};
+  
+  //     if (name && name !== "all") {
+  //       query.category = new RegExp(`^${name}$`, 'i');
+  //     }
+  
+  //     if (minPrice || maxPrice) {
+  //       query.Fprice = { 
+  //         $gte: Number(minPrice) || 0, 
+  //         $lte: Number(maxPrice) || Infinity 
+  //       };
+  //     }
+  
+  //     if (search) {
+  //       query.$or = [
+  //         { title: new RegExp(search, 'i') },
+  //         { category: new RegExp(search, 'i') },
+  //       ];
+  //     }
+  
+  //     if (size) {
+  //       query.sizes = { $in: [size] };
+  //     }
+  
+  //     if (color) {
+  //       query.colors = { $in: [color] };
+  //     }
+  
+  //     if (sort) {
+  //       sortQuery = sort === "asc" ? { Fprice: 1 } : { Fprice: -1 };
+  //     }
+  
+  //     const filteredProducts = await Product.find(query)
+  //       .sort({ ...sortQuery, _id: -1 })
+  //       .exec();
+  
+  //     console.log("products sent at front end = ", filteredProducts);
+  //     res.json(filteredProducts);
+  
+  //   } catch (error) {
+  //     res.status(500).json({ error: "Internal Server Error" });
+  //   }
+  // };
+  
+  // controllers/productController.js
 
-    try {
-      const { name, sort, minPrice, maxPrice, search, size, color } = req.query;
-  
-      let query = {};
-      let sortQuery = {};
-  
-      // Filter by category (if category name is provided)
-      if (name && name !== "all") {
-        query.category = new RegExp(`^${name}$`, 'i');
-      }
-  
-      // Filter by price range
-      if (minPrice || maxPrice) {
-        query.Fprice = { $gte: minPrice || 0, $lte: maxPrice || Infinity };
-      }
-  
-      // Filter by search term (title or category)
-      if (search) {
-        query.$or = [
-          { title: new RegExp(search, 'i') },
-          { category: new RegExp(search, 'i') },
-        ];
-      }
-  
-      // Filter by size (if size filter is provided)
-      if (size) {
-        query.sizes = size;
-      }
-  
-      // Filter by color (if color filter is provided)
-      if (color) {
-        query.colors = color;
-      }
-  
-      // Sort by price
-      if (sort) {
-        sortQuery = sort === "asc" ? { Fprice: 1 } : { Fprice: -1 };
-      }
-  
-      // Fetch products based on filters and sort order
-      const filteredProducts = await Product.find(query)
-        .sort({ ...sortQuery, _id: -1 })
-        .exec();
-  
-      res.json(filteredProducts);
-  
-    } catch (error) {
-      res.status(500).json({ error: "Internal Server Error" });
+exports.GetProduct = async (req, res) => {
+  try {
+    const { category, minPrice, maxPrice, size, color, search } = req.query;
+
+    const query = {};
+
+    if (category && category !== "all") {
+      query.category = category;
     }
-  };
-  
-  
-    exports.Product = async (req, res) => {  
+
+    if (minPrice && maxPrice) {
+      query.price = { $gte: parseInt(minPrice), $lte: parseInt(maxPrice) };
+    }
+
+    if (size) {
+      query.size = size;
+    }
+
+    if (color) {
+      query.color = color;
+    }
+
+    if (search) {
+      query.title = { $regex: search, $options: "i" };
+    }
+
+    const products = await Product.find(query).sort({ _id: -1 });
+    res.json(products);
+
+    console.log(products)
+  } catch (e) {
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+
+  exports.Product = async (req, res) => {  
 
     try {
       const newProduct = await Product.find().sort({ _id: -1 });
@@ -197,8 +230,16 @@ exports.AddProduct = async (req, res) => {
       existingProduct.sn = req.body.sn;
       existingProduct.category = req.body.category;
       existingProduct.description = req.body.description;
-      existingProduct.colors = req.body.colors || existingProduct.colors;
-      existingProduct.sizes = req.body.sizes || existingProduct.sizes; 
+      existingProduct.color1 = req.body.color1 || existingProduct.color1;
+      existingProduct.color2 = req.body.color2 || existingProduct.color2;
+      existingProduct.color3 = req.body.color3 || existingProduct.color3;
+      existingProduct.color4 = req.body.color4 || existingProduct.color4;
+      existingProduct.color5 = req.body.color5 || existingProduct.color5;
+      existingProduct.size1 = req.body.size1 || existingProduct.size1; 
+      existingProduct.size2 = req.body.size2 || existingProduct.size2; 
+      existingProduct.size3 = req.body.size3 || existingProduct.size3; 
+      existingProduct.size4 = req.body.size4 || existingProduct.size4; 
+      existingProduct.size5 = req.body.size5 || existingProduct.size5; 
       existingProduct.status = req.body.status;
       existingProduct.price = req.body.price || existingProduct.price;
       existingProduct.discount = req.body.discount;
