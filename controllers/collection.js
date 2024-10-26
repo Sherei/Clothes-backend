@@ -7,6 +7,7 @@ exports.AddCollection = async (req, res) => {
     const newCollection = new Collection(req.body);
     await newCollection.save();
     res.send({ message: "Collection Added" });
+  
   } catch (e) {
     console.log("E:",e);
     res.status(500).send("Internal Server Error");
