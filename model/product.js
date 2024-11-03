@@ -14,14 +14,9 @@ let productSchema = mongoose.Schema({
     size3:String,
     size4:String,
     size5:String,
-//     colors: [String], 
-//   sizes: [String],
     status:String,
-    category: {
-        type: mongoose.Schema.Types.ObjectId,
-        type:String,
-        ref: 'Collection',
-    },
+    collectionId:String,
+    category: String,
     sn: {
         type: Number,
         trim: true,

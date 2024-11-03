@@ -4,7 +4,6 @@ const Comment = require("../model/comment");
 exports.AddComment = async (req, res) => {  
 
     try {
-      console.log("Comments data is :", req.body)
       let ob = { ...req.body };
       delete ob._id;
       const newComment = await Comment.create(ob);
@@ -22,7 +21,6 @@ exports.AddComment = async (req, res) => {
       const comments = await Comment.find().sort({ _id: -1 });
       res.json(comments);
     } catch (error) {
-      console.error("Error fetching comments", error);
       res.status(500).json({ error: "Internal Server Error" });
     }
   };

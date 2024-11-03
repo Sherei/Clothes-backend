@@ -71,41 +71,52 @@ exports.AddProduct = async (req, res) => {
   
   // controllers/productController.js
 
-exports.GetProduct = async (req, res) => {
-  try {
-    const { category, minPrice, maxPrice, size, color, search } = req.query;
-
-    const query = {};
-
-    if (category && category !== "all") {
-      query.category = category;
+  exports.GetProduct = async (req, res) => {
+    try {
+      const { category, minPrice, maxPrice, size, color, search } = req.query;
+  
+      const query = {};
+  
+      if (category && category !== "all") {
+        query.category = category;
+      }
+  
+      if (minPrice && maxPrice) {
+        query.price = { $gte: parseInt(minPrice), $lte: parseInt(maxPrice) };
+      }
+  
+      // Update size filtering to search across multiple fields
+      if (size) {
+        query.$or = [
+          { size1: size },
+          { size2: size },
+          { size3: size },
+          { size4: size },
+          { size5: size },
+        ];
+      }
+  
+      if (color) {
+        query.$or = query.$or || [];
+        query.$or.push(
+          { color1: color },
+          { color2: color },
+          { color3: color },
+          { color4: color },
+          { color5: color }
+        );
+      }
+  
+      if (search) {
+        query.title = { $regex: search, $options: "i" };
+      }
+  
+      const products = await Product.find(query).sort({ _id: -1 });
+      res.json(products);
+    } catch (e) {
+      res.status(500).json({ error: "Internal Server Error" });
     }
-
-    if (minPrice && maxPrice) {
-      query.price = { $gte: parseInt(minPrice), $lte: parseInt(maxPrice) };
-    }
-
-    if (size) {
-      query.size = size;
-    }
-
-    if (color) {
-      query.color = color;
-    }
-
-    if (search) {
-      query.title = { $regex: search, $options: "i" };
-    }
-
-    const products = await Product.find(query).sort({ _id: -1 });
-    res.json(products);
-
-    console.log(products)
-  } catch (e) {
-    res.status(500).json({ error: "Internal Server Error" });
-  }
-};
-
+  };
 
   exports.Product = async (req, res) => {  
 
@@ -216,19 +227,13 @@ exports.GetProduct = async (req, res) => {
       const existingProduct = await Product.findById(productId);
       if (!existingProduct) {
         return res.status(404).json({ message: "Product not found" });
-      } else if (
-        req.body.images &&
-        (req.body.images.length < 1 || req.body.images.length > 10)
-      ) {
-        return res.status(400).json({
-          message: "Invalid number of images. Must be between 1 and 10.",
-        });
-      } else {
+      }else {
         existingProduct.images = req.body.images;
       }
       existingProduct.title = req.body.title;
       existingProduct.sn = req.body.sn;
       existingProduct.category = req.body.category;
+      existingProduct.collectionId = req.body.collectionId;
       existingProduct.description = req.body.description;
       existingProduct.color1 = req.body.color1 || existingProduct.color1;
       existingProduct.color2 = req.body.color2 || existingProduct.color2;

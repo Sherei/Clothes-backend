@@ -46,47 +46,47 @@ const collectionRoutes = require("./routes/collection");
 const paymentRoute = require("./routes/paymentRoute");
 
 app.post("/api/create-payment-intent", async (req, res) => {
-  const { amount, currency } = req.body; // Get payment amount, currency, and payment method from frontend
+  const { amount, currency } = req.body;
 
   try {
-    // Create a payment intent
+
     const paymentIntent = await stripe.paymentIntents.create({
       amount,
       currency,
-      // payment_method: paymentMethodId, // Optionally attach the payment method
     });
 
-    // Extract last 4 digits of card (if available)
+
     const last4 =
       paymentIntent.charges?.data[0]?.payment_method_details?.card?.last4 ||
       null;
-    const secrate = paymentIntent.client_secret;
-    // Save payment details to MongoDB
+
+
     const payment = new Payment({
       amount,
       currency,
-      secrate,
-      // // paymentMethodId,
-      // last4,
+      paymentIntentId: paymentIntent.id,
+      secrate: paymentIntent.client_secret,
+      last4,
       status: paymentIntent.status,
     });
     await payment.save();
 
-    // Send the client secret back to the frontend
+
     res.json({ clientSecret: paymentIntent.client_secret });
   } catch (err) {
     console.error("Error creating payment intent:", err);
     res.status(500).json({ error: "Payment failed" });
   }
 });
+
 app.post("/api/save-payment-status", async (req, res) => {
   const { paymentId, status } = req.body;
 
   try {
-    // Find the payment by the payment intent ID and update its status
+
     const payment = await Payment.findOneAndUpdate(
-      { secrate: paymentId }, // Match by payment intent ID
-      { status }, // Update the status to "paid" or whatever is passed
+      { paymentIntentId: paymentId },
+      { status },
       { new: true }
     );
 
@@ -100,6 +100,7 @@ app.post("/api/save-payment-status", async (req, res) => {
     res.status(500).json({ error: "Failed to update payment status" });
   }
 });
+
 // Admin Data
 
 app.get("/dashboard", async function (req, res) {

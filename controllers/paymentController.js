@@ -1,8 +1,3 @@
-// import { processStripePayment } from "../services/paymentService.js";
-// const processStripePayment = require("../services/paymentService.js");
-// const createOrder = require("../services/paymentServices.js");
-// import { createOrder } from "../services/orderService.js";
-
 const Stripe = require("stripe");
 const dotenv = require("dotenv");
 
@@ -18,7 +13,8 @@ exports.CreateStripePaymentAndOrder = async (req, res) => {
       (acc, item) => acc + item.price * item.quantity,
       0
     );
-    const paymentResponse = await processStripePayment(
+
+    const paymentResponse = await this.ProcessStripePayment(
       amount,
       paymentMethodDetails
     );
@@ -49,21 +45,26 @@ exports.ProcessStripePayment = async (amount, paymentMethodDetails) => {
 
   // Validate if the amount is a valid number
   if (isNaN(amount) || amount <= 0) {
-    console.log("start 3", "Invalid amount");
     return { success: false, error: "Invalid amount provided" };
   }
 
   try {
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: Math.round(amount?.amount * 100), // Convert amount to cents
+      amount: Math.round(amount * 100), // Convert amount to cents
       currency: "usd",
-      // Add other required parameters here if needed, like payment_method or confirmation
     });
 
-    console.log("start 2");
+    // Create a new Payment record in the database
+    const paymentRecord = new Payment({
+      amount,
+      currency: "usd",
+      secrate: paymentIntent.client_secret,
+      status: "pending",
+    });
+    await paymentRecord.save();
+
     return { success: true, data: paymentIntent };
   } catch (error) {
-    console.log("start 3", error.message);
     return { success: false, error: error.message };
   }
 };

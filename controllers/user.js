@@ -20,7 +20,6 @@ const generateOTP = () => {
 };
 exports.Signup = async (req, res) => {  
 
-    console.log("Welcome");
     try {
       const existingUser = await SignupUsers.findOne({ email: req.body.email });
   
@@ -78,7 +77,6 @@ exports.Signup = async (req, res) => {
     }
   };
   
-  //verify email
   exports.VerifyEmail = async (req, res) => {  
 
     console.log("first");
@@ -232,7 +230,7 @@ exports.Signup = async (req, res) => {
   
   // End
   exports.Login = async (req, res) => {  
-
+    console.log(req.body)
     try {
       const user = await SignupUsers.findOne({
         email: req.body.email,
@@ -240,12 +238,9 @@ exports.Signup = async (req, res) => {
       });
       if (!user) {
         return res.status(404).send("Invalid Credentials");
+      } else if (!user.isVerified) {
+        return res.status(403).send("Account not verified");
       }
-      // const isPasswordValid = await bcrypt.compare(
-      //   req.body.password,
-      //   user.password
-      // );
-  
       if (user) {
         token.sign(
           { tokenId: user._id },
@@ -262,6 +257,8 @@ exports.Signup = async (req, res) => {
       res.status(500).send("Internal Server Error");
     }
   };
+
+
   exports.SessionCheck = async (req, res) => {  
 
     try {
@@ -273,6 +270,7 @@ exports.Signup = async (req, res) => {
       });
     } catch (e) {}
   };
+
   exports.GetUsers = async (req, res) => {  
 
     try {
@@ -280,6 +278,7 @@ exports.Signup = async (req, res) => {
       res.json(newUser);
     } catch (e) {}
   };
+  
   exports.DeleteUser = async (req, res) => {  
 
     try {

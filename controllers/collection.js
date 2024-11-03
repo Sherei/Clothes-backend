@@ -1,5 +1,5 @@
 const Collection = require("../model/collection");
-
+const Product = require('../model/product')
 
 exports.AddCollection = async (req, res) => {  
 
@@ -7,7 +7,6 @@ exports.AddCollection = async (req, res) => {
     const newCollection = new Collection(req.body);
     await newCollection.save();
     res.send({ message: "Collection Added" });
-  
   } catch (e) {
     console.log("E:",e);
     res.status(500).send("Internal Server Error");
@@ -66,28 +65,38 @@ exports.UpdateCollection = async (req, res) => {
   }
 };
 
-exports.CollectionUpdate = async (req, res) => {  
 
+exports.CollectionUpdate = async (req, res) => {  
   try {
     const collectionId = req.body._id;
 
+    // Find the existing collection
     const existingCollection = await Collection.findById(collectionId);
-
     if (!existingCollection) {
       return res.status(404).json({ message: "Collection not found" });
     }
+
+    // Update the collection details
     existingCollection.category = req.body.category;
     existingCollection.image = req.body.image || existingCollection.image;
     await existingCollection.save();
-    res.json({ message: "Collection Updated" });
+
+    // Update the category of all products associated with this collection
+    await Product.updateMany(
+      { collectionId: collectionId }, // Find products by collectionId
+      { $set: { category: req.body.category } } // Set the new category
+    );
+
+    res.json({ message: "Collection and associated products updated" });
   } catch (e) {
+    console.error(e);
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
 
-exports.getActiveStatus = async (req, res) => {  
 
-    // console.log("running")
+
+exports.getActiveStatus = async (req, res) => {  
     try {
       const newCollection = await Collection.find({ status: "active" });
       res.json(newCollection);

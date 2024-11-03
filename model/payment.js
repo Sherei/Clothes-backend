@@ -9,11 +9,17 @@ const paymentSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  //   paymentMethodId: {
-  //     type: String,
-  //     required: true,
-  //   },
+  paymentIntentId: {
+    type: String,
+    required: true,
+  },
   secrate: {
+    type: String,
+  },
+  receiptUrl: {
+    type: String,
+  },
+  customerId: {
     type: String,
   },
   status: {
