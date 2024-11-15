@@ -20,57 +20,7 @@ exports.AddProduct = async (req, res) => {
     }
   };
 
-  // exports.GetProduct = async (req, res) => {
-  //   try {
-  //     const { name, sort, minPrice, maxPrice, search, size, color } = req.query;
   
-  //     let query = {};
-  //     let sortQuery = {};
-  
-  //     if (name && name !== "all") {
-  //       query.category = new RegExp(`^${name}$`, 'i');
-  //     }
-  
-  //     if (minPrice || maxPrice) {
-  //       query.Fprice = { 
-  //         $gte: Number(minPrice) || 0, 
-  //         $lte: Number(maxPrice) || Infinity 
-  //       };
-  //     }
-  
-  //     if (search) {
-  //       query.$or = [
-  //         { title: new RegExp(search, 'i') },
-  //         { category: new RegExp(search, 'i') },
-  //       ];
-  //     }
-  
-  //     if (size) {
-  //       query.sizes = { $in: [size] };
-  //     }
-  
-  //     if (color) {
-  //       query.colors = { $in: [color] };
-  //     }
-  
-  //     if (sort) {
-  //       sortQuery = sort === "asc" ? { Fprice: 1 } : { Fprice: -1 };
-  //     }
-  
-  //     const filteredProducts = await Product.find(query)
-  //       .sort({ ...sortQuery, _id: -1 })
-  //       .exec();
-  
-  //     console.log("products sent at front end = ", filteredProducts);
-  //     res.json(filteredProducts);
-  
-  //   } catch (error) {
-  //     res.status(500).json({ error: "Internal Server Error" });
-  //   }
-  // };
-  
-  // controllers/productController.js
-
   exports.GetProduct = async (req, res) => {
     try {
       const { category, minPrice, maxPrice, size, color, search } = req.query;

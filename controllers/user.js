@@ -230,7 +230,7 @@ exports.Signup = async (req, res) => {
   
   // End
   exports.Login = async (req, res) => {  
-    console.log(req.body)
+    // console.log(req.body)
     try {
       const user = await SignupUsers.findOne({
         email: req.body.email,
