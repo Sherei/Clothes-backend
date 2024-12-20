@@ -1,4 +1,4 @@
-const Banner = require("../model/bannet");
+const Banner = require("../model/banner");
 
 exports.AddBanner = async (req, res) => {  
 
