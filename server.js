@@ -113,7 +113,8 @@ app.get("/dashboard", async function (req, res) {
     const allOrder = await Orders.find();
     const allBlog = await Blog.find();
     const allCollection = await Collection.find();
-    res.json({ Users, Products, comments, allOrder, allBlog, allCollection });
+    const allBanner = await Banner.find();
+    res.json({ Users, Products, comments, allOrder, allBlog, allCollection,allBanner });
   } catch (e) {
     res.send(e);
   }
@@ -226,7 +227,6 @@ app.get("/AdminBlog", async (req, res) => {
 });
 
 app.use("/", userRoutes);
-
 app.use("/", productRoutes);
 app.use("/", cartRoutes);
 app.use("/", orderRoutes);
@@ -234,6 +234,7 @@ app.use("/", commentRoutes);
 app.use("/", videoRoutes);
 app.use("/", blogRoutes);
 app.use("/", collectionRoutes);
+app.use("/", bannerRoutes);
 app.use("/", paymentRoute);
 // app.use() // Remove or comment out this line
 
