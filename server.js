@@ -20,6 +20,7 @@ const Comment = require("./model/comment");
 const Payment = require("./model/payment"); // Import the Payment model
 
 const Collection = require("./model/collection");
+const Banner = require("./model/banner");
 
 const Orders = require("./model/orders");
 
@@ -43,6 +44,7 @@ const commentRoutes = require("./routes/comment");
 const videoRoutes = require("./routes/video");
 const blogRoutes = require("./routes/blog");
 const collectionRoutes = require("./routes/collection");
+const bannerRoutes = require("./routes/banner");
 const paymentRoute = require("./routes/paymentRoute");
 
 app.post("/api/create-payment-intent", async (req, res) => {
